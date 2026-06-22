@@ -1,0 +1,17 @@
+pandas
+numpy
+matplotlib
+seaborn
+requests 
+httpx2
+fastapi 
+uvicorn 
+os 
+joblib
+scikit-learn
+pydantic
+scipy 
+shap 
+h5py 
+pyarrow 
+msgpack
