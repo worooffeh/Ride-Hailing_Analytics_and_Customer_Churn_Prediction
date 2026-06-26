@@ -1,4 +1,4 @@
-# RideWise — Customer Analytics & Churn Prediction
+# RideWise — Ride-hailing Analytics & Customer Churn Prediction
 
 An end-to-end machine-learning project that turns five raw operational tables
 from a synthetic ride-hailing platform (Nairobi · Lagos · Cairo) into a working
