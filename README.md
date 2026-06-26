@@ -7,7 +7,7 @@ churn early-warning and customer-targeting system.
 The guiding discipline of the project: **every business challenge is paired with
 a concrete data-driven solution and a named ML method**, and the result is
 checked against the project's own success metrics. The full mapping lives in
-`RideWise_Workplan.docx`.
+`Project report.pdf`.
 
 ---
 
