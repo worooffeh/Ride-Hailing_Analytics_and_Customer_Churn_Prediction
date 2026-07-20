@@ -68,7 +68,14 @@ in full.
 
 ```bash
 pip install -r requirements.txt
-# Open notebooks/ in Jupyter and run 01 → 08 in order, or:
-python src/ridewise_pipeline.py          # builds the analytics table
+# Open notebooks/ in Jupyter and run 01 → 08 in order.
+python src/train_with_mlflow.py         # trains models and logs them to MLflow
 uvicorn src.app:app --reload             # serves the churn model on /score
 ```
+
+### MLflow quick start
+
+- Run the training script above to create local experiment runs under the project's mlruns directory.
+- Open the UI with: `mlflow ui --backend-store-uri file:///.../mlruns`
+- You can also set `MLFLOW_TRACKING_URI` to a custom local or remote tracking server.
+
