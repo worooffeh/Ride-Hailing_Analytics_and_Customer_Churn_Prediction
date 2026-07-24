@@ -22,10 +22,24 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-ROOT = Path(__file__).resolve().parent.parent
-DATA_PATH = ROOT / "data" / "analytics_table.csv"
-MODEL_DIR = ROOT / "models"
-MODEL_DIR.mkdir(exist_ok=True)
+PROJECT_ROOT = Path(os.getenv("PROJECT_ROOT", str(Path(__file__).resolve().parent.parent))).expanduser().resolve()
+
+
+def resolve_path(env_name: str, default: Path) -> Path:
+    raw_value = os.getenv(env_name)
+    if not raw_value:
+        return default
+
+    candidate = Path(raw_value).expanduser()
+    return candidate if candidate.is_absolute() else (PROJECT_ROOT / candidate).resolve()
+
+
+DATA_PATH = resolve_path("DATA_PATH", PROJECT_ROOT / "data" / "analytics_table.csv")
+MODEL_DIR = resolve_path("MODEL_DIR", PROJECT_ROOT / "models")
+MLRUNS_DIR = resolve_path("MLRUNS_DIR", PROJECT_ROOT / "mlruns")
+DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
+MODEL_DIR.mkdir(parents=True, exist_ok=True)
+MLRUNS_DIR.mkdir(parents=True, exist_ok=True)
 
 RANDOM_STATE = 42
 TEST_SIZE = 0.25
@@ -75,9 +89,7 @@ def save_feature_manifest(features: list[str]) -> None:
 
 
 def train_and_log() -> None:
-    mlruns_dir = ROOT / "mlruns"
-    mlruns_dir.mkdir(exist_ok=True)
-    tracking_uri = os.getenv("MLFLOW_TRACKING_URI", f"sqlite:///{ROOT / 'mlruns' / 'mlflow.db'}")
+    tracking_uri = os.getenv("MLFLOW_TRACKING_URI", f"sqlite:///{MLRUNS_DIR / 'mlflow.db'}")
     mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment("ridewise-churn-prediction")
 
