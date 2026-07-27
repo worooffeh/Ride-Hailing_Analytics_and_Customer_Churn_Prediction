@@ -47,12 +47,24 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
+      - name: Validate deploy secrets
+        run: |
+          if [ -z "${{ secrets.EC2_HOST }}" ]; then
+            echo "Missing GitHub secret: EC2_HOST"
+            exit 1
+          fi
+          if [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then
+            echo "Missing GitHub secret: EC2_SSH_KEY"
+            exit 1
+          fi
+
       - name: Deploy to EC2 over SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ vars.EC2_HOST }}
+          host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
+          timeout: 120s
           script: |
             set -e
             REPO_DIR=/home/ec2-user/ridewise
