@@ -1,0 +1,22 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ridewise-api
+    environment:
+      PROJECT_ROOT: /app
+    ports:
+      - "8000:8000"
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: ridewise-streamlit
+    environment:
+      PROJECT_ROOT: /app
+    depends_on:
+      - api
+    ports:
+      - "8501:8501"

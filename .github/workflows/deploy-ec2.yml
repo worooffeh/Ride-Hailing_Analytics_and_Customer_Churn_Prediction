@@ -1,0 +1,83 @@
+name: Build and Deploy to EC2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'deploy/**'
+      - 'Dockerfile'
+      - 'Dockerfile.streamlit'
+      - 'docker-compose.yml'
+      - 'requirements.txt'
+      - '.github/workflows/deploy-ec2.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: ridewise-api:ci
+
+      - name: Build Streamlit image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.streamlit
+          push: false
+          tags: ridewise-streamlit:ci
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to EC2 over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ vars.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            REPO_DIR=/home/ec2-user/ridewise
+            REPO_URL=https://github.com/${{ github.repository }}.git
+
+            if [ ! -d "$REPO_DIR/.git" ]; then
+              git clone "$REPO_URL" "$REPO_DIR"
+            fi
+
+            cd "$REPO_DIR"
+            git fetch origin main
+            git checkout main
+            git pull --ff-only origin main
+
+            python3.11 -m venv .venv || true
+            . .venv/bin/activate
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+
+            sudo cp deploy/systemd/ridewise-api.service /etc/systemd/system/ridewise-api.service
+            sudo cp deploy/systemd/ridewise-streamlit.service /etc/systemd/system/ridewise-streamlit.service
+            sudo cp deploy/nginx/ridewise.conf /etc/nginx/conf.d/ridewise.conf
+
+            sudo systemctl daemon-reload
+            sudo systemctl enable ridewise-api ridewise-streamlit nginx
+            sudo systemctl restart ridewise-api ridewise-streamlit nginx
+
+            sudo systemctl --no-pager --full status ridewise-api ridewise-streamlit nginx

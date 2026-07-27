@@ -3,10 +3,9 @@ numpy
 matplotlib
 seaborn
 requests 
-httpx2
+httpx
 fastapi 
 uvicorn 
-os 
 joblib
 scikit-learn
 pydantic
@@ -16,5 +15,4 @@ h5py
 pyarrow 
 msgpack
 mlflow
-gradio
-time
+streamlit
