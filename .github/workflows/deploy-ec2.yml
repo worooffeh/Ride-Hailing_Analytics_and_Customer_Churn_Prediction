@@ -77,7 +77,7 @@ jobs:
             cd "$REPO_DIR"
             git fetch origin main
             git checkout main
-            git pull --ff-only origin main
+            git reset --hard origin/main
 
             python3.11 -m venv .venv || true
             . .venv/bin/activate
