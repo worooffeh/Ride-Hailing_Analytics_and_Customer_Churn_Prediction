@@ -16,6 +16,9 @@
 
 </div>
 
+<p align="center">
+  <img reports="[https://github.com/worooffeh/Ride-Hailing_Analytics_and_Customer_Churn_Prediction/ridewise_social_preview.PNG" width="750" title="hover text">
+</p>
 ---
 
 ## 📊 Results at a glance
