@@ -15,7 +15,7 @@
 **From raw operational data → to trained models → to a live, monitored API on AWS.**
 
 
-<p align="center">
+<p align="left">
   <img src="reports/ridewise_social_preview.png" width="750" alt="RideWise — Customer Analytics & Churn Prediction">
 </p>
 
