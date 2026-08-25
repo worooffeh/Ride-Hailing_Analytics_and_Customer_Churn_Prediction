@@ -1,4 +1,4 @@
-<div align="center">
+<div align="left">
 
 # 🚗 RideWise — Customer Analytics & Churn Prediction
 
@@ -14,12 +14,12 @@
 
 **From raw operational data → to trained models → to a live, monitored API on AWS.**
 
-
+-----
 <p align="left">
   <img src="reports/ridewise_social_preview.png" width="750" alt="RideWise — Customer Analytics & Churn Prediction">
 </p>
 
-
+----
 ## 📊 Results at a glance
 
 | Metric | Result | What it means |
@@ -51,7 +51,7 @@ This project builds the missing capability: a churn early-warning system, a cust
 
 The project follows a disciplined, reproducible pipeline where **every stage answers a specific business question**, and every model is judged on the metric that actually matters for retention (catching real leavers) rather than raw accuracy.
 
-```
+```python
 Raw data  →  Clean & audit  →  Feature engineering  →  Segmentation
           →  Churn modelling →  Interpretability      →  Targeting
           →  Deployment (API + dashboard)  →  Monitoring
@@ -102,7 +102,7 @@ Riders are ranked by risk and the **top 15%** are flagged for retention — tune
 
 The trained system is served in production, not left in a notebook.
 
-```
+```python
                     ┌─────────────────────────────────────────┐
    Internet  ──▶    │  Nginx (reverse proxy, ports 80/443)     │
                     └───────────────┬─────────────────────────┘
@@ -139,7 +139,7 @@ The trained system is served in production, not left in a notebook.
 
 ## 📁 Project structure
 
-```
+```bash
 ridewise/
 ├── notebooks/                      # 8 executed, teaching-style notebooks (01 → 08)
 │   ├── 01_data_audit_and_cleaning.ipynb
@@ -164,7 +164,6 @@ ridewise/
 ├── requirements.txt                # pinned dependencies
 └── README.md
 ```
-
 ---
 
 ## ⚡ Quickstart
@@ -235,7 +234,7 @@ curl -X POST http://localhost:8000/score \
 
 ---
 
-<div align="center">
+<div align="left">
 
 *RideWise is a portfolio project built on a synthetic dataset. The signal-enrichment step and its rationale are documented transparently in `notebooks/03_feature_engineering.ipynb` and the project workplan.*
 
