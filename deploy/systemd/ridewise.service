@@ -1,0 +1,25 @@
+[Unit]
+Description=RideWise Application Stack
+Documentation=https://github.com/your-username/ridewise
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/ridewise
+ExecStart=/usr/local/bin/docker-compose -f docker-compose.prod.yml up -d
+ExecStop=/usr/local/bin/docker-compose -f docker-compose.prod.yml down
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=10s
+
+# Security
+User=docker
+NoNewPrivileges=true
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/ridewise /var/log/nginx /etc/letsencrypt
+
+[Install]
+WantedBy=multi-user.target

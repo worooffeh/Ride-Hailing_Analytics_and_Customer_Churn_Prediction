@@ -4,6 +4,11 @@
 venv/
 env/
 
+# Trial Versions
+.version_init/
+.gradio/
+.deploy/
+
 # OS cruft
 .DS_Store
 

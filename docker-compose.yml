@@ -1,22 +1,89 @@
+#---------------------------------------------------------------------------
+# RideWise — Docker Compose for FastAPI API + Streamlit UI
+#---------------------------------------------------------------------------
+# Usage: docker compose up -d --pull always
+# • API:       http://127.0.0.1:8000/docs (OpenAPI)
+# • UI:        http://127.0.0.1:8501 (Streamlit)
+# • Network:   Private (services communicate via service names)
+# • Security:  Both bound to 127.0.0.1 only (not exposed to the Internet)
+# • Restart:   Automatic recovery on crash or host reboot
+#---------------------------------------------------------------------------
+
+version: '3.9'
+
 services:
+  #=========================================================================
+  # FastAPI scoring service
+  #=========================================================================
   api:
     build:
       context: .
       dockerfile: Dockerfile
+    image: ridewise-api:latest
     container_name: ridewise-api
-    environment:
-      PROJECT_ROOT: /app
     ports:
-      - "8000:8000"
+      # Publish to localhost only (127.0.0.1:8000 → container:8000)
+      # NOT reachable from the Internet unless you explicitly port-forward
+      - "127.0.0.1:8000:8000"
+    environment:
+      # Python logging config (optional, for extra verbosity)
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=info
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    # Optional: mount source for hot-reload during development (comment out for production)
+    # volumes:
+    #   - ./src:/app/src
+    networks:
+      - ridewise-net
+    labels:
+      co.elastic.logs/enabled: "true"
 
-  streamlit:
+  #=========================================================================
+  # Streamlit analytics dashboard
+  #=========================================================================
+  ui:
     build:
       context: .
       dockerfile: Dockerfile.streamlit
-    container_name: ridewise-streamlit
-    environment:
-      PROJECT_ROOT: /app
-    depends_on:
-      - api
+    image: ridewise-ui:latest
+    container_name: ridewise-ui
     ports:
-      - "8501:8501"
+      # Publish to localhost only (same security model as API)
+      - "127.0.0.1:8501:8501"
+    environment:
+      # Point the dashboard to the API via the internal service name
+      - RIDEWISE_API_URL=http://api:8000
+      - STREAMLIT_SERVER_HEADLESS=true
+      - PYTHONUNBUFFERED=1
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    # Wait for API to be healthy before starting the dashboard
+    depends_on:
+      api:
+        condition: service_healthy
+    # Optional: mount source for development
+    # volumes:
+    #   - ./src:/app/src
+    #   - ./models:/app/models
+    networks:
+      - ridewise-net
+    labels:
+      co.elastic.logs/enabled: "true"
+
+#---------------------------------------------------------------------------
+# Shared private network (services communicate by service name)
+#---------------------------------------------------------------------------
+networks:
+  ridewise-net:
+    driver: bridge

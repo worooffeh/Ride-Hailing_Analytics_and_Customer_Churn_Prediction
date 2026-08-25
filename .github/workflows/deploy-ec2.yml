@@ -84,12 +84,12 @@ jobs:
             python -m pip install --upgrade pip
             pip install -r requirements.txt
 
-            sudo cp deploy/systemd/ridewise-api.service /etc/systemd/system/ridewise-api.service
-            sudo cp deploy/systemd/ridewise-streamlit.service /etc/systemd/system/ridewise-streamlit.service
+            sudo cp deploy/systemd/ridewise.service /etc/systemd/system/ridewise.service
             sudo cp deploy/nginx/ridewise.conf /etc/nginx/conf.d/ridewise.conf
 
             sudo systemctl daemon-reload
-            sudo systemctl enable ridewise-api ridewise-streamlit nginx
-            sudo systemctl restart ridewise-api ridewise-streamlit nginx
+            sudo systemctl disable --now ridewise-api ridewise-streamlit || true
+            sudo systemctl enable ridewise nginx
+            sudo systemctl restart ridewise nginx
 
-            sudo systemctl --no-pager --full status ridewise-api ridewise-streamlit nginx
+            sudo systemctl --no-pager --full status ridewise nginx

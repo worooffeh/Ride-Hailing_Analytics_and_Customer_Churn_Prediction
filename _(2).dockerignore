@@ -1,0 +1,19 @@
+# Keep the build context small and the image clean.
+# Anything listed here is NOT sent to the Docker build.
+
+.venv/
+__pycache__/
+*.pyc
+.git/
+.github/
+notebooks/
+data/*.csv            # model artifacts go in via models/, raw data usually not needed at serve time
+*.ipynb
+.env
+*.pem
+*.key
+tests/
+.pytest_cache/
+README.md
+.version_init/
+.gradio/

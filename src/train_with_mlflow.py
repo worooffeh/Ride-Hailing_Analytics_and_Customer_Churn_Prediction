@@ -125,7 +125,7 @@ def train_and_log() -> None:
         with mlflow.start_run(run_name="LogisticRegression", nested=True) as lr_run:
             lr_model = make_pipeline(
                 StandardScaler(),
-                LogisticRegression(max_iter=2000, class_weight="balanced", C=0.5),
+                LogisticRegression(max_iter=2000, class_weight="balanced", C=0.5),  # MLflow does not support logging pipelines, so we log the model separately after fitting
             )
             lr_model.fit(X_train, y_train)
             lr_metrics = evaluate_model(lr_model, X_test, y_test)
@@ -134,7 +134,7 @@ def train_and_log() -> None:
                     "model_family": "logistic_regression",
                     "scaler": "StandardScaler",
                     "class_weight": "balanced",
-                    "C": 0.5,
+                    "C": 0.5,                                           # Regularization strength 
                     "max_iter": 2000,
                 }
             )
@@ -145,11 +145,11 @@ def train_and_log() -> None:
                 MODEL_DIR / "churn_lr.joblib",
             )
 
-        with mlflow.start_run(run_name="RandomForest", nested=True) as rf_run:
+        with mlflow.start_run(run_name="RandomForest", nested=True) as rf_run:      # Nested run for Random Forest model training and logging
             rf_model = RandomForestClassifier(
-                n_estimators=400,
-                max_depth=10,
-                min_samples_leaf=20,
+                n_estimators=400,                       # Number of trees in the forest, meaning the number of decision trees to be built in the ensemble, ensemble consists of multiple decision trees, and the final prediction is made by aggregating the predictions of all the individual trees
+                max_depth=10,                           # Maximum depth of the tree, means the maximum number of levels in each decision tree, deeper trees can capture more complex patterns but may also lead to overfitting, so we limit the depth to 10 to prevent overfitting and improve generalization
+                min_samples_leaf=20,                    # Minimum number of samples required to be at a leaf node, means the minimum number of samples that must be present in a leaf node for it to be considered a valid split, setting this parameter helps prevent overfitting by ensuring that each leaf node has enough samples to make reliable predictions, we set it to 20 to ensure that each leaf node has at least 20 samples
                 class_weight="balanced",
                 random_state=RANDOM_STATE,
                 n_jobs=-1,

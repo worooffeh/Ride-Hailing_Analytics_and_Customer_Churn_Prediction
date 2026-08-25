@@ -1,0 +1,101 @@
+#---------------------------------------------------------------------------
+# RideWise — Production Docker Compose with Nginx reverse proxy
+#---------------------------------------------------------------------------
+# Usage: docker compose -f docker-compose.prod.yml up -d --pull always
+#
+# Prerequisites:
+#   1. Set DOCKER_REGISTRY_URL, DOCKER_USERNAME in .env
+#   2. Pull images: docker compose -f docker-compose.prod.yml pull
+#   3. Configure Nginx (deploy/nginx/ridewise.conf)
+#   4. Set up SSL with certbot (see deploy/README.md)
+#   5. Start stack: docker compose -f docker-compose.prod.yml up -d
+#---------------------------------------------------------------------------
+
+version: '3.9'
+
+services:
+  #=========================================================================
+  # Nginx reverse proxy (HTTP/HTTPS, public-facing)
+  #=========================================================================
+  nginx:
+    image: nginx:latest
+    container_name: ridewise-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Nginx configuration
+      - ./deploy/nginx/ridewise.conf:/etc/nginx/conf.d/ridewise.conf:ro
+      # SSL certificates (pre-configured with certbot)
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+      # Logs
+      - ./logs/nginx:/var/log/nginx
+    networks:
+      - ridewise-net
+    depends_on:
+      - api
+      - ui
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    labels:
+      co.elastic.logs/enabled: "true"
+
+  #=========================================================================
+  # FastAPI scoring service (internal only)
+  #=========================================================================
+  api:
+    image: ${DOCKER_REGISTRY_URL:-docker.io}/${DOCKER_USERNAME}/ridewise-api:latest
+    container_name: ridewise-api
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=info
+    networks:
+      - ridewise-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    labels:
+      co.elastic.logs/enabled: "true"
+    # No ports: only accessible via Nginx internal network
+
+  #=========================================================================
+  # Streamlit dashboard (internal only)
+  #=========================================================================
+  ui:
+    image: ${DOCKER_REGISTRY_URL:-docker.io}/${DOCKER_USERNAME}/ridewise-ui:latest
+    container_name: ridewise-ui
+    restart: always
+    environment:
+      - RIDEWISE_API_URL=http://api:8000
+      - STREAMLIT_SERVER_HEADLESS=true
+      - PYTHONUNBUFFERED=1
+    networks:
+      - ridewise-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      api:
+        condition: service_healthy
+    labels:
+      co.elastic.logs/enabled: "true"
+    # No ports: only accessible via Nginx internal network
+
+#---------------------------------------------------------------------------
+# Shared private network (services communicate by service name)
+#---------------------------------------------------------------------------
+networks:
+  ridewise-net:
+    driver: bridge

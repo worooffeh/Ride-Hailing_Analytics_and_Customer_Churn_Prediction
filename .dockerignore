@@ -1,19 +1,78 @@
+# .dockerignore — exclude build artifacts and unnecessary files from the Docker build context
+# Smaller build context = faster `docker build` and less cluttered layers
+
+# Version control
 .git
+.gitignore
 .github
-.venv
-.gradio
-.streamlit
+
+# Python
 __pycache__
 *.pyc
 *.pyo
 *.pyd
+*.egg-info/
+*.egg
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+
+# Virtual environments
+.venv
+venv/
+ENV/
+env/
+
+# IDE & editors
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter & notebooks
+notebooks/
 *.ipynb
 *.ipynb_checkpoints
-notebooks/
-mlruns/
+.jupyter
+
+# Data & reports (not needed in production container)
+data/
 reports/
 visualizations/
-tmp_smoke.py
+*.csv
+*.xlsx
+
+# Experiment tracking & logs
+mlruns/
+.mlflow
+*.log
+logs/
+
+# Build artifacts
 build/
 dist/
-*.log
+*.egg-info
+
+# Temporary files
+tmp_*
+.version_init/
+.streamlit/
+.gradio/
+
+# Docker & CI
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+.github/
+
+# Documentation
+README.md
+LICENSE
