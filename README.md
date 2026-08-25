@@ -17,7 +17,7 @@
 </div>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/worooffeh/Ride-Hailing_Analytics_and_Customer_Churn_Prediction/main/reports/ridewise_social_preview.png)" width="750" alt="RideWise — Customer Analytics & Churn Prediction">
+  <img src="https://github.com/worooffeh/Ride-Hailing_Analytics_and_Customer_Churn_Prediction/edit/main/reports/ridewise_social_preview.png)" width="750" alt="RideWise — Customer Analytics & Churn Prediction">
 </p>
 ---
 
