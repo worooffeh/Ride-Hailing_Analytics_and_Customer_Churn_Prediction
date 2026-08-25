@@ -14,7 +14,6 @@
 
 **From raw operational data → to trained models → to a live, monitored API on AWS.**
 
-</div>
 
 <p align="center">
   <img src="https://github.com/worooffeh/Ride-Hailing_Analytics_and_Customer_Churn_Prediction/edit/main/reports/ridewise_social_preview.png" width="750" alt="RideWise_Churn_Prediction">
